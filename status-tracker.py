@@ -81,8 +81,8 @@ async def notification_generate(before, after):
         title=f"{after.name}#{after.discriminator}'s status has changed",\
         color=0xFFFF00)
     notification.set_author(name=after.name, icon_url=after.avatar_url)
-    notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}\n{after.activity.detail}", inline=True)
-    notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity.name}\n{after.activity.detail}", inline=True)
+    notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}\n{after.activity.details}", inline=True)
+    notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity.name}\n{after.activity.details}", inline=True)
     return notification
 
 
