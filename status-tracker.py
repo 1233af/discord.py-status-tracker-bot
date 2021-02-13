@@ -36,7 +36,7 @@ async def ready_message(client):
 async def on_ready():
     await ready_message(client)
 
-    
+
 
 @client.event
 async def on_message(message):
@@ -45,7 +45,7 @@ async def on_message(message):
 
     if message.content.startswith('!hello'):
         await message.channel.send('Hello!')
-    
+
     if message.content.startswith("!members"):
         for member in message.guild.members:
             try:
@@ -62,7 +62,7 @@ async def on_message(message):
             await message.channel.send("done")
         else:
             await message.channel.send("There already exists a status notification channel in this server!!\nYou can not create more than one status notification channel in a server!!")
-    
+
     if message.content.startswith("!del_status_notification_channel"):
         if not message.guild.id in status_notification_channels.keys():
             await message.channel.send("There is no status notification channel in this server!!")
@@ -81,8 +81,8 @@ async def notification_generate(before, after):
         title=f"{after.name}#{after.discriminator}'s status has changed",\
         color=0xFFFF00)
     notification.set_author(name=after.name, icon_url=after.avatar_url)
-    notification.add_field(name="before", value=f"status : {before.status}\nactivity : {before.activity}", inline=True)
-    notification.add_field(name="after", value=f"status : {after.status}\nactivity : {after.activity}", inline=True)
+    notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}\n{after.activity.detail}", inline=True)
+    notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity.name}\n{after.activity.detail}", inline=True)
     return notification
 
 
