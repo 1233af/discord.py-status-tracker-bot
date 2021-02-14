@@ -54,7 +54,7 @@ async def on_message(message):
             except:
                 await message.channel.send(f"{member.name} : {member.status}")
 
-    if message.content.startswith(command_prefix+"-set_status_notification_channel"):
+    if message.content.startswith(command_prefix+"set_status_notification_channel"):
         if not message.guild.id in status_notification_channels.keys():
             status_notification_channels[message.guild.id] = message.channel.id
             with open("status-notification-channel-list.txt", "a") as f:
