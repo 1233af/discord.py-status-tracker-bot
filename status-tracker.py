@@ -84,13 +84,18 @@ async def notification_generate(before, after):
     notification.set_author(name=after.name, icon_url=after.avatar_url)
     try:
         notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}\n{after.activity.details}", inline=True)
-        notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}\n{before.activity.details}", inline=True)
     except:
         try:
             notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}", inline=True)
-            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}", inline=True)
         except:
             notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity}", inline=True)
+
+    try:
+        notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}\n{before.activity.details}", inline=True)
+    except:
+        try:
+            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}", inline=True)
+        except:
             notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity}", inline=True)
     return notification
 
