@@ -1,3 +1,6 @@
+SAVE_CHANNEL_ID = int(os.environ['save-channel-id'])
+
+
 status_notification_channels = {}
 
 import discord
@@ -8,33 +11,45 @@ intents.members = True
 intents.presences = True
 client = discord.Client(intents=intents)
 
-if os.path.isfile("status-notification-channel-list.txt"):
-    with open("status-notification-channel-list.txt", 'r') as f:
-        while(True):
-            temp1 = f.readline()[:-2]
-            print(temp1)
-            if not temp1: break
 
-            temp2 = f.readline()[:-2]
-            print(temp2)
-            status_notification_channels[int(temp1)] = int(temp2)
-else:
-    f = open("status-notification-channel-list.txt", "w")
-    f.close()
+async def get_save(save_channel_id):
+    status_notification_channels = {}
+    try:
+        save_channel = client.get_channel(save_channel_id)
+        channels = await save_channel.history(limit=1).flatten()
+        channels = channels[0].content
+        print(channels)
+        for channel in channels.split("\n"):
+            print(channel)
+            c = channel.split(":")
+            status_notification_channels[int(c[0])] = int(c[1])
+    except:
+        pass
+    print(status_notification_channels)
+    return status_notification_channels
 
+
+async def save(save_channel_id, channels):
+    save_channel = client.get_channel(save_channel_id)
+    try:
+        await save_channel.send("\n".join([str(g)+":"+str(c) for g, c in channels.items()]))
+    except:
+        pass
 
 async def ready_message(client):
     for guild in client.guilds:
         for channel in guild.channels:
-            try:
-                await channel.send("I'm ready!!")
-            except:
-                print(f"maybe {guild.name} - {channel.name} is not a text channel")
+            if channel.id != SAVE_CHANNEL_ID:
+                try:
+                    await channel.send("I'm ready!!")
+                except:
+                    print(f"maybe {guild.name} - {channel.name} is not a text channel")
 
 
 @client.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="member status"))
+    global status_notification_channels
+    status_notification_channels = await get_save(SAVE_CHANNEL_ID)
     await ready_message(client)
 
 
@@ -58,9 +73,7 @@ async def on_message(message):
     if message.content.startswith(command_prefix+"set_status_notification_channel"):
         if not message.guild.id in status_notification_channels.keys():
             status_notification_channels[message.guild.id] = message.channel.id
-            with open("status-notification-channel-list.txt", "a") as f:
-                f.write(str(message.guild.id)+"\n")
-                f.write(str(message.channel.id)+"\n")
+            await save(SAVE_CHANNEL_ID, status_notification_channels)
             await message.channel.send("done")
         else:
             await message.channel.send("There already exists a status notification channel in this server!!\nYou can not create more than one status notification channel in a server!!")
@@ -70,10 +83,7 @@ async def on_message(message):
             await message.channel.send("There is no status notification channel in this server!!")
         else:
             del status_notification_channels[message.guild.id]
-            with open("status-notification-channel-list.txt", 'wt') as f:
-                for server_id, channel_id in enumerate(status_notification_channels):
-                    f.write(str(server_id)+"\n")
-                    f.write(str(channel_id)+"\n")
+            await save(SAVE_CHANNEL_ID, status_notification_channels)
             await message.channel.send("done")
 
 
@@ -85,19 +95,14 @@ async def notification_generate(before, after):
     notification.set_author(name=after.name, icon_url=after.avatar_url)
     try:
         notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}\n{after.activity.details}", inline=True)
+        notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity.name}\n{after.activity.details}", inline=True)
     except:
         try:
             notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity.name}", inline=True)
+            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity.name}", inline=True)
         except:
             notification.add_field(name="after", value=f"status : {after.status}\n\nactivity : \n{after.activity}", inline=True)
-
-    try:
-        notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}\n{before.activity.details}", inline=True)
-    except:
-        try:
-            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity.name}", inline=True)
-        except:
-            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{before.activity}", inline=True)
+            notification.add_field(name="before", value=f"status : {before.status}\n\nactivity : \n{after.activity}", inline=True)
     return notification
 
 
