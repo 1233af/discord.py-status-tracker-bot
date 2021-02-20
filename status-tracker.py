@@ -1,10 +1,13 @@
+import discord
+import os
+
+
 SAVE_CHANNEL_ID = int(os.environ['save-channel-id'])
 
 
 status_notification_channels = {}
 
-import discord
-import os
+
 
 intents = discord.Intents.default()
 intents.members = True
