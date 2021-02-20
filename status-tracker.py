@@ -34,6 +34,7 @@ async def ready_message(client):
 
 @client.event
 async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="member status"))
     await ready_message(client)
 
 
